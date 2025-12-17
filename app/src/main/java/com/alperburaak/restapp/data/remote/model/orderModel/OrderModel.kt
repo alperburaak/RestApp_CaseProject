@@ -22,7 +22,9 @@ data class OrderAddress(
     val full_address: String,
     val city: String,
     val district: String,
-    val neighborhood: String
+    val neighborhood: String,
+    val latitude: Double,
+    val longitude: Double
 )
 
 data class OrderDetails(

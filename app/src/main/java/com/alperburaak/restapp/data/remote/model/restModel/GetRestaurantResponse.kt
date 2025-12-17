@@ -3,7 +3,7 @@ package com.alperburaak.restapp.data.remote.model
 data class GetRestaurantResponse(
     val success: Boolean,
     val message: String,
-    val data: List<Restaurant>,
+    val data: List<Restaurant> = emptyList(),
     val links: PaginationLinks,
     val meta: Meta
 )
