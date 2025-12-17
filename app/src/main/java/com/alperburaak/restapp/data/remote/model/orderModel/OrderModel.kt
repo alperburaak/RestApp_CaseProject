@@ -1,25 +1,31 @@
-package com.alperburaak.restapp.data.remote.model.WsModel
+package com.alperburaak.restapp.data.remote.model.orderModel
 
-data class WsOrderCreatedPayload(
+data class Order(
     val order_id: Int,
     val unique_code: String,
-    val customer_name: String,
-    val customer_phone: String,
-    val customer_email: String,
-    val delivery_address: WsDeliveryAddress,
-    val order_details: WsOrderDetails,
-    val items: List<WsOrderItem>,
+    val customer: OrderCustomer,
+    val delivery_address: OrderAddress,
+    val order_details: OrderDetails,
+    val items: List<OrderItem>,
     val created_at: String
 )
 
-data class WsDeliveryAddress(
+
+
+data class OrderCustomer(
+    val name: String,
+    val phone: String,
+    val email: String
+)
+
+data class OrderAddress(
     val full_address: String,
     val city: String,
     val district: String,
     val neighborhood: String
 )
 
-data class WsOrderDetails(
+data class OrderDetails(
     val total_amount: Double,
     val discount_amount: Double,
     val delivery_fee: Double,
@@ -30,7 +36,7 @@ data class WsOrderDetails(
     val note: String?
 )
 
-data class WsOrderItem(
+data class OrderItem(
     val product_name: String,
     val quantity: Int,
     val price: Double,

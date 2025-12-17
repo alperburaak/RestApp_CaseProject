@@ -1,4 +1,4 @@
-package com.alperburaak.restapp.data.remote.model.RestModel
+package com.alperburaak.restapp.data.remote.model.restModel
 
 import com.alperburaak.restapp.data.remote.model.Restaurant
 

@@ -1,4 +1,4 @@
-package com.alperburaak.restapp.data.remote.model.AuthModel
+package com.alperburaak.restapp.data.remote.model.authModel
 
 data class RegisterResponse(
     val success: Boolean,

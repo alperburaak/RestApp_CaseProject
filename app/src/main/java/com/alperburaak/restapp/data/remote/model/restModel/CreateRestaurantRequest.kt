@@ -1,4 +1,4 @@
-package com.alperburaak.restapp.data.remote.model.RestModel
+package com.alperburaak.restapp.data.remote.model.restModel
 
 data class CreateRestaurantRequest(
     val name: String,

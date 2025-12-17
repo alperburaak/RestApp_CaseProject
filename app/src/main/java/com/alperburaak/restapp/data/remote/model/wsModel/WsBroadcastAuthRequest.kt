@@ -1,4 +1,4 @@
-package com.alperburaak.restapp.data.remote.model.WsModel
+package com.alperburaak.restapp.data.remote.model.wsModel
 
 
 data class WsBroadcastAuthRequest(
