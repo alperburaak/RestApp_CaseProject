@@ -1,4 +1,4 @@
-package com.alperburaak.restapp.data.remote.model.authModel
+package com.alperburaak.restapp.data.remote.model.authModell
 
 data class User(
     val id: Int,
@@ -16,5 +16,5 @@ data class User(
     val bussinessDescription: String,
     val isCustomer: Boolean,
     val isSubCustomer: Boolean,
-    val isAdmin: Boolean
+    val isAdmin: Int
 )
