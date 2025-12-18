@@ -3,6 +3,7 @@ package com.alperburaak.restapp.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alperburaak.restapp.data.local.TokenDataStore
+import com.alperburaak.restapp.data.remote.model.authModell.AuthState
 import com.alperburaak.restapp.data.remote.model.authModell.LoginRequest
 import com.alperburaak.restapp.data.remote.model.authModell.RegisterRequest
 import com.alperburaak.restapp.data.repository.AuthRepository
@@ -17,57 +18,64 @@ class AuthViewModel(
     private val tokenStore: TokenDataStore
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AuthUiState())
-    val state: StateFlow<AuthUiState> = _state.asStateFlow()
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading())
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    init {
-        observeToken()
-    }
+    init { observeToken() }
 
     private fun observeToken() {
         viewModelScope.launch {
             tokenStore.tokenFlow.collect { token ->
-                if (token != null) {
-                    _state.update { it.copy(token = token) }
+                _authState.value = if (token.isNullOrBlank()) {
+                    AuthState.Unauthenticated
+                } else {
+                    AuthState.Authenticated(token)
                 }
             }
         }
     }
 
     fun login(email: String, password: String) {
-        _state.update { it.copy(isLoading = true, error = null) }
+        _authState.value = AuthState.Loading()
 
         viewModelScope.launch {
-            val result = repo.login(LoginRequest(email, password))
-
-            result
+            repo.login(LoginRequest(email, password))
                 .onSuccess { res ->
-                    _state.update { it.copy(isLoading = false, token = res.token) }
+                    tokenStore.saveToken(res.token)
+
                 }
                 .onFailure { e ->
-                    _state.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }
+                    _authState.value = AuthState.Loading(error = e.message ?: "Unknown error")
                 }
         }
     }
 
     fun register(request: RegisterRequest) {
-        _state.update { it.copy(isLoading = true, error = null) }
+        _authState.value = AuthState.Loading()
 
         viewModelScope.launch {
-            val result = repo.register(request)
-
-            result
+            repo.register(request)
                 .onSuccess { res ->
-                    val token = res.token
-                    _state.update { it.copy(isLoading = false, token = token) }
+                    _authState.value = AuthState.Authenticated(res.token)
                 }
                 .onFailure { e ->
-                    _state.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }
+                    _authState.value = AuthState.Loading(error = e.message ?: "Unknown error")
                 }
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            tokenStore.clearToken()
+            _authState.value = AuthState.Unauthenticated
+        }
+    }
+
     fun clearError() {
-        _state.update { it.copy(error = null) }
+        // hata saklama şekline göre:
+        val current = _authState.value
+        if (current is AuthState.Loading && current.error != null) {
+            _authState.value = AuthState.Loading(error = null)
+        }
     }
 }
