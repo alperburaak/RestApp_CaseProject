@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,6 +66,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
 
     /* -------------------- COROUTINES + FLOW -------------------- */
@@ -91,6 +95,11 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     /* -------------------- MAPBOX -------------------- */
-    implementation ("com.mapbox.maps:android-ndk27:11.17.1")
-    implementation ("com.mapbox.extension:maps-compose-ndk27:11.17.1")
+    implementation("com.mapbox.maps:android:11.0.0")
+    implementation("com.mapbox.extension:maps-compose:11.0.0")
+
+    implementation("com.pusher:pusher-java-client:2.4.4")
+
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
 }
