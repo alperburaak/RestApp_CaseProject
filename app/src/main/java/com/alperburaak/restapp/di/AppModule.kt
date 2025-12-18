@@ -17,7 +17,6 @@ import com.alperburaak.restapp.data.remote.AuthInterceptor
 import com.alperburaak.restapp.data.remote.api.OrderApi
 import com.alperburaak.restapp.data.remote.api.RestaurantApi
 import com.alperburaak.restapp.data.remote.ws.PusherManager
-import com.alperburaak.restapp.data.remote.ws.SocketManager
 import com.alperburaak.restapp.data.repository.OrderRepository
 import com.alperburaak.restapp.data.repository.OrderRepositoryImpl
 import com.alperburaak.restapp.data.repository.RestaurantRepository
@@ -30,18 +29,22 @@ private const val BASE_URL = "http://188.34.155.223/new-qr-menu/api/"
 
 val appModule = module {
 
-    // OkHttp
+    // 1. AuthInterceptor (Token ekleyici)
+    single { AuthInterceptor(tokenStore = get()) }
+
+    // 2. OkHttpClient
     single {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
         OkHttpClient.Builder()
-            .addInterceptor(logging)
+            .addInterceptor(get<AuthInterceptor>()) // Token interceptor'ı EKLE
+            .addInterceptor(logging)                // Log interceptor'ı EKLE
             .build()
     }
 
-    // Retrofit
+    // 3. Retrofit
     single {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -50,57 +53,25 @@ val appModule = module {
             .build()
     }
 
-    // Api
-    single<AuthApi> {
-        get<Retrofit>().create(AuthApi::class.java)
-    }
+    // API Tanımları
+    single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
+    single<RestaurantApi> { get<Retrofit>().create(RestaurantApi::class.java) }
+    single<OrderApi> { get<Retrofit>().create(OrderApi::class.java) }
 
-    // Repository
-    single<AuthRepository> {
-        AuthRepositoryImpl(api = get(), tokenStore = get())
-    }
+    // Repository Tanımları
+    single<AuthRepository> { AuthRepositoryImpl(api = get(), tokenStore = get()) }
+    single<RestaurantRepository> { RestaurantRepositoryImpl(api = get()) }
+    single<OrderRepository> { OrderRepositoryImpl(api = get()) }
 
-    viewModel { AuthViewModel(repo = get(),tokenStore = get()) }
-
-    single { TokenDataStore(get()) }
-
-    single<RestaurantApi> { get<retrofit2.Retrofit>().create(RestaurantApi::class.java) }
-
-    single<RestaurantRepository> {
-        RestaurantRepositoryImpl(api = get())
-    }
-
+    // ViewModel Tanımları
+    viewModel { AuthViewModel(repo = get(), tokenStore = get()) }
     viewModel { RestaurantViewModel(repo = get()) }
+    viewModel { OrderViewModel(repo = get(), pusherManager = get()) }
 
-    single { AuthInterceptor(tokenStore = get()) }
-
-    single {
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        OkHttpClient.Builder()
-            .addInterceptor(get<AuthInterceptor>())   // önce header eklesin
-            .addInterceptor(logging)                  // sonra loglasın
-            .build()
-    }
-
-    single<OrderApi> { get<retrofit2.Retrofit>().create(OrderApi::class.java) }
-
-    single<OrderRepository> {
-        OrderRepositoryImpl(api = get())
-    }
-
-    viewModel { OrderViewModel(repo = get(),pusherManager = get()) }
-
-    single { SocketManager() }
-
+    // Diğerleri
+    single { TokenDataStore(get()) }
     single { PusherManager(tokenStore = get()) }
-
-
-
-
-
-
-
 }
+
+
+

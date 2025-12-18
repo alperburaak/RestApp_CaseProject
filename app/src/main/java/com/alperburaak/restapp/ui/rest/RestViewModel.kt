@@ -1,7 +1,5 @@
 package com.alperburaak.restapp.ui.rest
 
-
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alperburaak.restapp.data.remote.model.Restaurant
@@ -20,6 +18,11 @@ class RestaurantViewModel(
     private val _state = MutableStateFlow(RestaurantUiState())
     val state: StateFlow<RestaurantUiState> = _state.asStateFlow()
 
+    fun selectRestaurant(restaurant: Restaurant) {
+        _state.update { it.copy(selectedRestaurant = restaurant) }
+    }
+
+    // 1. Fonksiyon: Restoranları Getir
     fun getRestaurant() {
         _state.update { it.copy(isLoading = true, error = null, created = false) }
 
@@ -29,7 +32,8 @@ class RestaurantViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            restaurant = res.data[0],
+                            restaurants = res.data,
+                            selectedRestaurant = res.data.firstOrNull(),
                             error = null
                         )
                     }
@@ -40,23 +44,37 @@ class RestaurantViewModel(
         }
     }
 
+    // 2. Fonksiyon: Restoran Oluştur
     fun createRestaurant(request: CreateRestaurantRequest) {
         _state.update { it.copy(isLoading = true, error = null, created = false) }
 
         viewModelScope.launch {
             repo.createRestaurant(request)
                 .onSuccess { res ->
-                    _state.update {
-                        it.copy(
+                    _state.update { currentState ->
+                        // Yeni oluşturulan restoranı mevcut listeye ekle
+                        val updatedList = if (res.restaurant != null) {
+                            currentState.restaurants + res.restaurant
+                        } else {
+                            currentState.restaurants
+                        }
+
+                        currentState.copy(
                             isLoading = false,
-                            restaurant = res.restaurant,
+                            restaurants = updatedList,
+                            selectedRestaurant = res.restaurant,
                             created = true,
                             error = null
                         )
                     }
                 }
                 .onFailure { e ->
-                    _state.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Unknown error"
+                        )
+                    }
                 }
         }
     }

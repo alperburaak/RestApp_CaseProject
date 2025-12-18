@@ -7,6 +7,7 @@ import com.alperburaak.restapp.data.remote.model.Restaurant
 data class RestaurantUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val restaurant: Restaurant? = null,
+    val restaurants: List<Restaurant> = emptyList(),
+    val selectedRestaurant: Restaurant? = null,
     val created: Boolean = false
 )

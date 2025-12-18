@@ -2,6 +2,7 @@ package com.alperburaak.restapp.data.remote.model.orderModel
 
 data class Order(
     val order_id: Int,
+    val restaurant_id: Int?,
     val unique_code: String,
     val customer: OrderCustomer,
     val delivery_address: OrderAddress,

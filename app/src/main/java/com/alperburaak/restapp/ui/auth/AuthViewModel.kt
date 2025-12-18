@@ -72,7 +72,7 @@ class AuthViewModel(
     }
 
     fun clearError() {
-        // hata saklama şekline göre:
+
         val current = _authState.value
         if (current is AuthState.Loading && current.error != null) {
             _authState.value = AuthState.Loading(error = null)
